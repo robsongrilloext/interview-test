@@ -1,0 +1,46 @@
+----- Utilizei o banco de dados(MYSQL) para solucionar o problema -----
+
+1- CRIAR TABELA DE LOGS
+CREATE TABLE `gympass`.`log` (
+  `text` LONGTEXT NULL DEFAULT NULL);
+
+2- CRIAR TABELA DE CORRIDA
+CREATE TABLE `corrida` (
+  `hora` varchar(45) DEFAULT NULL,
+  `codPiloto` varchar(45) DEFAULT NULL,
+  `nomePiloto` varchar(45) DEFAULT NULL,
+  `nVolta` varchar(45) DEFAULT NULL,
+  `tVolta` varchar(45) DEFAULT NULL,
+  `velocidade` varchar(45) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+3- POPULAR TABELA DE LOG##
+mysql -u root -p -D gympass  -e "LOAD DATA LOCAL INFILE 'log.txt' INTO TABLE log"
+
+4- POPULAR TABELA DE CORRIDA
+INSERT INTO gympass.corrida
+	SELECT 
+	substr(text,1,12) as hora, 
+	substr(text,20,2) as codPiloto, 
+	substr(text,22,34) as nomePiloto, 
+	substr(text,63,1) as nVolta, 
+	substr(text,77,7) as tVolta, 
+	substr(text,109,6) as velocodade
+	FROM gympass.log
+	ORDER by nVolta DESC
+
+5- EXIBE RESULTADO ESPERADO DA CORRIDA
+SELECT 
+	hora,
+	codPiloto,
+	nomePiloto,
+	nVolta,
+	velocidade, 
+	TIMEDIFF(hora,'23:48:00.000') AS tempoTotalProva 
+FROM gympass.corrida
+GROUP BY codPiloto
+ORDER by hora ASC
+
+
